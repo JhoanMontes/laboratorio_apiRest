@@ -1,6 +1,7 @@
 import express from 'express';
 import morgan from 'morgan';
-
+import database from './database.js';
+import cors from 'cors'
 
 // CONFIGURACION
 let app = express();
@@ -11,6 +12,10 @@ app.listen(app.get('port'), () => {
 })
 
 // MIDDLEWARES
+
+app.use(cors({
+    origin: ['http://127.0.0.1:5500', 'http://127.0.0.1:5501']
+}))
 app.use(morgan('dev'));
 
 // RUTAS
@@ -20,24 +25,8 @@ app.get('/', (req, res) => {
 })
 
 
-app.get('/usuarios', (req, res) => {
-    res.json([
-        {
-            id: 1,
-            nombre: 'Juan',
-            email: 'juan@gmail.com'
-        },
-        {
-            id: 2,
-            nombre: 'Pedro',
-            email: 'pedro@gmail.com'
-        },
-        {
-            id: 3,
-            nombre: 'Ana',
-            email: 'ana@gmail.com'
-        }
-      
-        
-    ])
+app.get('/usuarios', async (req, res) => {
+    let conexion = await database.obtenerConexion()
+    let resultado = await conexion.query('SELECT * FROM ciudadano');
+    res.json(resultado)
 })
